@@ -8,6 +8,26 @@ suite('azure table (sas)', function() {
   var azure       = require('fast-azure-storage');
   var taskcluster = require('taskcluster-client');
 
+  test('azureAccounts', function() {
+    return helper.auth.azureAccounts(
+    ).then(function(result) {
+      assert.deepEqual(result.accounts, _.keys(helper.cfg.app.azureAccounts));
+    });
+  });
+
+  test('azureAccountTables', async function() {
+    // First make sure the table exists
+    await helper.auth.azureTableSAS(
+      helper.testaccount,
+      'TestTable'
+    );
+    return helper.auth.azureAccountTables(
+      helper.testaccount,
+    ).then(function(result) {
+      assert(result.tables.includes('TestTable'));
+    });
+  });
+
   test('azureTableSAS', function() {
     return helper.auth.azureTableSAS(
       helper.testaccount,
